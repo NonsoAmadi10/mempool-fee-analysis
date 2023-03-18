@@ -1,13 +1,18 @@
 package app
 
-import "github.com/gofiber/fiber/v2"
+import (
+	// "github.com/NonsoAmadi10/mempool-fee/handler"
+	"github.com/gofiber/fiber/v2"
+)
 
 func App() *fiber.App {
-	app := fiber.New()
+	// app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	// app.Get("/", func(c *fiber.Ctx) error {
+	// 	return c.SendString("Hello, World!")
+	// })
 
-	return app
+	// app.Get("/best_fee", handler.EstmateBestFee)
+	// return app
+
 }
