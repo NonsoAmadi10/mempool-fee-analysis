@@ -11,7 +11,7 @@ func Bitcoind() *rpcclient.Client {
 	// Connect to a running Bitcoin Core node via RPC
 	connCfg := &rpcclient.ConnConfig{
 		Host:         GetEnv("BTC_HOST"),
-		User:         GetEnv("BTC_UER"),
+		User:         GetEnv("BTC_USER"),
 		Pass:         GetEnv("BTC_PASS"),
 		HTTPPostMode: true,
 		DisableTLS:   true,

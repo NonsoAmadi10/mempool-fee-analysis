@@ -21,3 +21,19 @@ func EstmateBestFee(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(response)
 }
+
+func EstimateFees(c *fiber.Ctx) error {
+	high, best, low, err := mempoolfee.GetPriorityFees()
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	response := &Fee{
+		BestFee: best,
+		Low:     low,
+		High:    high,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}

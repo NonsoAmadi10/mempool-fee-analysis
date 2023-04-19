@@ -11,8 +11,6 @@ import (
 func GetBestFee() float64 {
 
 	client := utils.Bitcoind()
-
-	log.Println("here")
 	defer client.Shutdown()
 
 	// Get the current mempool
@@ -60,9 +58,9 @@ func GetBestFee() float64 {
 	// Estimate the fee rate as the n-th highest fee rate
 	n := 10 // Use the 10th highest fee rate as an example
 	if n > len(txInfos) {
-		n = len(txInfos)
+		n = len(txInfos) + 1
 	}
-	feeRateEstimate := txInfos[n-1].feeRate
+	feeRateEstimate := txInfos[n-2].feeRate
 
 	// Print the estimated fee rate
 	log.Printf("Estimated fee rate: %f sat/vB\n", feeRateEstimate*1e8)
