@@ -56,7 +56,7 @@ func GetBestFee() float64 {
 	})
 
 	// Estimate the fee rate as the n-th highest fee rate
-	n := 10 // Use the 10th highest fee rate as an example
+	n := 12 // Use the 10th highest fee rate as an example
 	if n > len(txInfos) {
 		n = len(txInfos) + 1
 	}
@@ -118,13 +118,13 @@ func GetPriorityFees() (highFeeRate, normalFeeRate, lowFeeRate float64, err erro
 	})
 
 	// Estimate the fee rate as the n-th highest fee rate
-	n := 10 // Use the 10th highest fee rate as an example
+	n := 12 // Use the 10th highest fee rate as an example
 	if n > len(txInfos) {
 		n = len(txInfos)
 	}
-	highPriority := txInfos[0].feeRate
-	normalPriority := txInfos[n-1].feeRate
-	lowPriority := txInfos[len(txInfos)-1].feeRate
+	highPriority := txInfos[0].feeRate * 1e8
+	normalPriority := txInfos[n-2].feeRate * 1e8
+	lowPriority := txInfos[len(txInfos)-1].feeRate * 1e8
 
 	return highPriority, normalPriority, lowPriority, nil
 }
