@@ -22,6 +22,16 @@ func EstmateBestFee(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+func EstimateImprovedBestFee(c *fiber.Ctx) error {
+	bestFee := mempoolfee.GetImprovedBestFee()
+
+	response := &Fee{
+		BestFee: bestFee,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
 func EstimateFees(c *fiber.Ctx) error {
 	high, best, low, err := mempoolfee.GetPriorityFees()
 
@@ -33,6 +43,16 @@ func EstimateFees(c *fiber.Ctx) error {
 		BestFee: best,
 		Low:     low,
 		High:    high,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+func EstimateHalfHourFee(c *fiber.Ctx) error {
+	bestFee := mempoolfee.GetHalfHourFee()
+
+	response := &Fee{
+		BestFee: bestFee,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)

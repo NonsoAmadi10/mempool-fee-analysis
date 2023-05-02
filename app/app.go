@@ -12,8 +12,12 @@ func App() *fiber.App {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Get("/best_fee", handler.EstmateBestFee)
+	v1 := app.Group("/api/v1")
 
-	app.Get("/recommended-fees", handler.EstimateFees)
+	v2 := app.Group("/api/v2")
+	v1.Get("/best-fee", handler.EstmateBestFee)
+
+	v1.Get("/recommended-fees", handler.EstimateFees)
+	v2.Get("/best-fee", handler.EstimateImprovedBestFee)
 	return app
 }
