@@ -5,6 +5,8 @@ import (
 	"math"
 	"sort"
 
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
+
 	"github.com/NonsoAmadi10/mempool-fee/utils"
 	"github.com/btcsuite/btcd/btcutil"
 )
@@ -212,57 +214,51 @@ func GetHalfHourFee() float64 {
 	client := utils.Bitcoind()
 	defer client.Shutdown()
 
-	// Get the height of the block chain
-	_, height, err := client.GetBestBlock()
+	// Get the current mempool state.
+	txs, err := client.GetRawMempool()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Get the height of the block chain half an hour ago
-	targetHeight := height - int32(6) // 6 blocks per hour
-	targetBlockHash, err := client.GetBlockHash(int64(targetHeight))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Calculate fee rates for each transaction in the mempool.
+	feeRates := make([]float64, len(txs))
+	for i, txHash := range txs {
+		txVerbose, err := client.GetRawTransactionVerbose(txHash)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	// Get the block half an hour ago
-	targetBlock, err := client.GetBlock(targetBlockHash)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Calculate the total fees and transaction sizes in the block
-	var totalFees btcutil.Amount
-	var totalSize int
-	for _, tx := range targetBlock.Transactions {
-		// Calculate the total input value of the transaction
-		var totalIn btcutil.Amount
-		for _, in := range tx.TxIn {
-			outpoint := in.PreviousOutPoint
-			prevTx, err := client.GetRawTransaction(&outpoint.Hash)
+		var totalIn, totalOut float64
+		for _, vin := range txVerbose.Vin {
+			txHashFromStr, _ := chainhash.NewHashFromStr(vin.Txid)
+			txInVerbose, err := client.GetRawTransactionVerbose(txHashFromStr)
 			if err != nil {
 				log.Fatal(err)
 			}
-			prevOut := prevTx.MsgTx().TxOut[outpoint.Index]
-			totalIn += btcutil.Amount(prevOut.Value)
+			totalIn += txInVerbose.Vout[vin.Vout].Value
 		}
 
-		// Calculate the total output value of the transaction
-		var totalOut btcutil.Amount
-		for _, out := range tx.TxOut {
-			totalOut += btcutil.Amount(out.Value)
+		for _, vout := range txVerbose.Vout {
+			totalOut += vout.Value
 		}
 
-		// Calculate the transaction fee and size
 		fee := totalIn - totalOut
-		size := tx.SerializeSize()
-
-		totalFees += fee
-		totalSize += size
+		size := float64(txVerbose.Size)
+		feeRates[i] = float64(fee) / size
 	}
 
-	// Calculate the fee rate for the block
-	feeRate := float64(totalFees) / float64(totalSize)
+	// Sort transactions in descending order based on fee rates.
+	sort.SliceStable(feeRates, func(i, j int) bool {
+		return feeRates[i] > feeRates[j]
+	})
 
-	return feeRate
+	// Calculate median fee rate of top 50 transactions.
+	var totalFeeRate float64
+	for i := 0; i < 50; i++ {
+		totalFeeRate += feeRates[i]
+	}
+	halfhourFeeRate := totalFeeRate / 50.0
+
+	return halfhourFeeRate * 1e8
+
 }

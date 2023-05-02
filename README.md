@@ -36,3 +36,32 @@ We then divide the transaction fee by the size of the transaction in bytes to ge
 Once we have calculated the fee rate for each transaction in the mempool, we sort the transactions by fee rate, from highest to lowest. We then select the nth highest fee rate as our estimated fee rate.
 
 In this implementation, I used the 10th highest fee rate as an example. This means that I selected the fee rate of the 10th transaction in the sorted list of transactions as the estimated fee rate. The idea is that by selecting a fee rate that is higher than most of the other transactions in the mempool, we can ensure that our transaction gets confirmed relatively quickly. However, selecting a fee rate that is too high can result in unnecessarily high transaction fees, so it's important to strike a balance between transaction confirmation speed and cost.
+
+### Half-hour Fee Estimation
+The half-hour algorithm is a way to estimate the transaction fee based on the recent transaction activity in the Bitcoin network. The idea is to calculate the median fee rate of the transactions included in the previous half hour, and use that as an estimate for the current transaction fee.
+
+The reason why this algorithm is useful is that the transaction fees in the Bitcoin network can be highly variable, depending on the amount of traffic and the urgency of the transaction. By using the recent transaction activity as a guide, the half-hour algorithm can provide a more accurate estimate of the appropriate transaction fee.
+
+Here's how the getHalfhourFee function implements the half-hour algorithm:
+
+1. First, it gets the current block height from the Bitcoin client using the GetBlockCount function.
+
+2. Then, it calculates the block height of the block that was mined half an hour ago by subtracting 6 blocks (since blocks are mined roughly every 10 minutes) from the current block height.
+
+3. Next, it retrieves the block hash of the block that was mined half an hour ago using the GetBlockHash function.
+
+4. It then retrieves the block data for the block that was mined half an hour ago using the GetBlockVerbose function.
+
+5. From the block data, it extracts the list of transactions that were included in the block.
+
+6. For each transaction in the list, it calculates the fee per byte by dividing the transaction fee by the transaction size in bytes.
+
+7. It then adds the fee per byte for each transaction to a slice of fee rates.
+
+8. Once it has collected all the fee rates, it sorts the slice in ascending order.
+
+9. It calculates the median fee rate by taking the middle value of the sorted slice.
+
+10. It returns the median fee rate as the estimated fee per byte for the current transaction.
+
+The code we just cooked implements the half-hour algorithm in Go using the btcd package, which provides an interface to a Bitcoin client. It uses a combination of Bitcoin client functions and built-in Go functions to retrieve the necessary data and perform the necessary calculations. Overall, the getHalfhourFee function provides a convenient way to estimate the appropriate transaction fee based on recent transaction activity in the Bitcoin network.
