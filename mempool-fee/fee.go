@@ -254,7 +254,12 @@ func GetHalfHourFee() float64 {
 
 	// Calculate median fee rate of top 50 transactions.
 	var totalFeeRate float64
-	for i := 0; i < 50; i++ {
+	n := len(feeRates)
+	if n < 50 {
+		log.Printf("Warning: Mempool contains only %d transactions, expected at least 50", n)
+		n = 50
+	}
+	for i := 0; i < n && i < 50; i++ {
 		totalFeeRate += feeRates[i]
 	}
 	halfhourFeeRate := totalFeeRate / 50.0
