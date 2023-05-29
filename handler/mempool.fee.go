@@ -48,6 +48,17 @@ func EstimateFees(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+func EsitmateFastestFee(c *fiber.Ctx) error {
+	fast, _, _, err := mempoolfee.GetPriorityFees()
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	response := &Fee{
+		BestFee: fast,
+	}
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
 func EstimateHalfHourFee(c *fiber.Ctx) error {
 	bestFee := mempoolfee.GetHalfHourFee()
 

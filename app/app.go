@@ -20,5 +20,6 @@ func App() *fiber.App {
 	v1.Get("/recommended-fees", handler.EstimateFees)
 	v2.Get("/best-fee", handler.EstimateImprovedBestFee)
 	v2.Get("/half-hour-fee", handler.EstimateHalfHourFee)
+	v2.Get("/fastest-fee", handler.EstimateHalfHourFee)
 	return app
 }
