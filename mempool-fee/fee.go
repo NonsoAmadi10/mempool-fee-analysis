@@ -58,12 +58,17 @@ func GetBestFee() float64 {
 		return txInfos[i].feeRate > txInfos[j].feeRate
 	})
 
-	// Estimate the fee rate as the n-th highest fee rate
-	n := 12 // Use the 10th highest fee rate as an example
-	if n > len(txInfos) {
-		n = len(txInfos) + 1
+	// Calculate the index based on 80th percentile
+	index := int(math.Floor(float64(len(txInfos)) * (float64(80) / 100.0)))
+
+	// Check if the index is within the valid range
+	if index >= len(txInfos) {
+		index = len(txInfos) - 1
+	} else if index < 0 {
+		index = 0
 	}
-	feeRateEstimate := txInfos[n-2].feeRate
+	// Retrieve the fee rate at the calculated index
+	feeRateEstimate := txInfos[index].feeRate
 
 	// Print the estimated fee rate
 	log.Printf("Estimated fee rate: %f sat/vB\n", feeRateEstimate*1e8)
@@ -252,18 +257,24 @@ func GetHalfHourFee() float64 {
 		return feeRates[i] > feeRates[j]
 	})
 
-	// Calculate median fee rate of top 50 transactions.
-	var totalFeeRate float64
+	// we calculate the median fee rate by considering the size of the mempool.
+	var halfhourFeeRate float64
 	n := len(feeRates)
-	if n < 50 {
-		log.Printf("Warning: Mempool contains only %d transactions, expected at least 50", n)
-		n = 50
-	}
-	for i := 0; i < n && i < 50; i++ {
-		totalFeeRate += feeRates[i]
-	}
-	halfhourFeeRate := totalFeeRate / 50.0
 
+	// If the mempool is empty, an error is logged.
+	if n == 0 {
+		log.Printf("Mempool is empty")
+	}
+
+	// If the number of transactions in the mempool is even, we take the average of the middle two fee rates
+	if n%2 == 0 {
+		halfhourFeeRate = (feeRates[n/2-1] + feeRates[n/2]) / 2.0
+	} else {
+		// If the number of transactions is odd, we take the fee rate at the middle index.
+		halfhourFeeRate = feeRates[n/2]
+	}
+
+	//the median fee rate is returned after scaling it by 1e8 to convert it to satoshis per byte.
 	return halfhourFeeRate * 1e8
 
 }

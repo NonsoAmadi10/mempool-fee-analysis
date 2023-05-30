@@ -33,9 +33,9 @@ To calculate the fee rate for each transaction, we first need to calculate the t
 
 We then divide the transaction fee by the size of the transaction in bytes to get the fee rate. The fee rate is expressed in satoshis per byte. For example, if a transaction has a fee of 100 satoshis and a size of 200 bytes, the fee rate is 0.5 satoshis per byte.
 
-Once we have calculated the fee rate for each transaction in the mempool, we sort the transactions by fee rate, from highest to lowest. We then select the nth highest fee rate as our estimated fee rate.
+Once we have calculated the fee rate for each transaction in the mempool, we sort the transactions by fee rate, from highest to lowest. We then select the highest fee rate in the nth-percentile as our estimated fee rate.
 
-In this implementation, I used the 10th highest fee rate as an example. This means that I selected the fee rate of the 10th transaction in the sorted list of transactions as the estimated fee rate. The idea is that by selecting a fee rate that is higher than most of the other transactions in the mempool, we can ensure that our transaction gets confirmed relatively quickly. However, selecting a fee rate that is too high can result in unnecessarily high transaction fees, so it's important to strike a balance between transaction confirmation speed and cost.
+In this implementation, I used the highest fee rate in the 80th-percentile as an example. The idea is that by selecting a fee rate that is higher than most of the other transactions in the mempool, we can ensure that our transaction gets confirmed relatively quickly. However, selecting a fee rate that is too high can result in unnecessarily high transaction fees, so it's important to strike a balance between transaction confirmation speed and cost.
 
 ### Half-hour Fee Estimation
 The half-hour algorithm is a way to estimate the transaction fee based on the recent transaction activity in the Bitcoin network. The idea is to calculate the median fee rate of the transactions included in the previous half hour, and use that as an estimate for the current transaction fee.
