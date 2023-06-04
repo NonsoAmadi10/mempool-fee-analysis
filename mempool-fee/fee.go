@@ -70,9 +70,6 @@ func GetBestFee() float64 {
 	// Retrieve the fee rate at the calculated index
 	feeRateEstimate := txInfos[index].feeRate
 
-	// Print the estimated fee rate
-	log.Printf("Estimated fee rate: %f sat/vB\n", feeRateEstimate*1e8)
-
 	bestFee := feeRateEstimate * 1e8
 
 	return bestFee
@@ -207,9 +204,6 @@ func GetImprovedBestFee() float64 {
 	}
 	feeRateEstimate := filteredTxInfos[n].feeRate
 
-	// Print the estimated fee rate
-	log.Printf("Estimated fee rate: %f sat/vB\n", feeRateEstimate*1e8)
-
 	bestFee := feeRateEstimate * 1e8
 
 	return bestFee
@@ -278,3 +272,97 @@ func GetHalfHourFee() float64 {
 	return halfhourFeeRate * 1e8
 
 }
+
+// func GetHalfHour() float64 {
+
+// 	client := utils.Bitcoind()
+// 	defer client.Shutdown()
+
+// 	// Get the current block height
+// 	blockCount, err := client.GetBlockCount()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	// Calculate the block height of the block mined half an hour ago
+// 	targetBlockHeight := blockCount - 6
+
+// 	// Get the block hash of the target block
+// 	blockHash, err := client.GetBlockHash(targetBlockHeight)
+
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	// Get the block data for the target block
+// 	blockVerbose, err := client.GetBlockVerbose(blockHash)
+
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	// Extract the list of transactions from the block data
+// 	transactions := blockVerbose.RawTx
+
+// 	// Calculate fee rates for each transaction
+// 	feeRates := make([]float64, len(transactions))
+
+// 	for i, tx := range transactions {
+// 		txHashStr := tx.Hash
+
+// 		txHash, err := chainhash.NewHashFromStr(txHashStr)
+
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		txVerbose, err := client.GetRawTransactionVerbose(txHash)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		var totalIn, totalOut float64
+// 		for _, vin := range txVerbose.Vin {
+// 			txHashFromStr, _ := chainhash.NewHashFromStr(vin.Txid)
+// 			txInVerbose, err := client.GetRawTransactionVerbose(txHashFromStr)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 			totalIn += txInVerbose.Vout[vin.Vout].Value
+// 		}
+
+// 		for _, vout := range txVerbose.Vout {
+// 			totalOut += vout.Value
+// 		}
+
+// 		fee := totalIn - totalOut
+// 		size := float64(txVerbose.Size)
+// 		feeRates[i] = float64(fee) / size
+
+// 	}
+
+// 	// Sort transactions in descending order based on fee rates.
+// 	sort.SliceStable(feeRates, func(i, j int) bool {
+// 		return feeRates[i] > feeRates[j]
+// 	})
+
+// 	// we calculate the median fee rate by considering the size of the mempool.
+// 	var halfhourFeeRate float64
+// 	n := len(feeRates)
+
+// 	// If the mempool is empty, an error is logged.
+// 	if n == 0 {
+// 		log.Printf("Mempool is empty")
+// 	}
+
+// 	// If the number of transactions in the mempool is even, we take the average of the middle two fee rates
+// 	if n%2 == 0 {
+// 		halfhourFeeRate = (feeRates[n/2-1] + feeRates[n/2]) / 2.0
+// 	} else {
+// 		// If the number of transactions is odd, we take the fee rate at the middle index.
+// 		halfhourFeeRate = feeRates[n/2]
+// 	}
+
+// 	//the median fee rate is returned after scaling it by 1e8 to convert it to satoshis per byte.
+// 	return halfhourFeeRate * 1e8
+// }

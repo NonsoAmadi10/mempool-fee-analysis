@@ -16,10 +16,10 @@ func App() *fiber.App {
 
 	v2 := app.Group("/api/v2")
 	v1.Get("/best-fee", handler.EstmateBestFee)
-
+	v1.Get("/half-hour-fee", handler.EstimateHalfHourFee)
 	v1.Get("/recommended-fees", handler.EstimateFees)
 	v2.Get("/best-fee", handler.EstimateImprovedBestFee)
-	v2.Get("/half-hour-fee", handler.EstimateHalfHourFee)
+	// v2.Get("/half-hour-fee", handler.EstimateV2HalfHour)
 	v2.Get("/fastest-fee", handler.EstimateHalfHourFee)
 	return app
 }

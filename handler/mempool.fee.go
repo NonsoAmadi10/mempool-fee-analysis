@@ -68,3 +68,14 @@ func EstimateHalfHourFee(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(response)
 }
+
+// func EstimateV2HalfHour(c *fiber.Ctx) error {
+// 	halfHour := mempoolfee.GetHalfHour()
+
+// 	response := &Fee{
+// 		BestFee: halfHour,
+// 	}
+
+// 	return c.Status(fiber.StatusOK).JSON(response)
+
+// }
