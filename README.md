@@ -13,7 +13,25 @@ This is a project written in Golang that estimates the fee for a Bitcoin transac
 1. Clone the repository to your local machine.
 2. Install the necessary dependencies by running `go mod download`.
 
-## Usage
+## C.L.I Usage
+1. Build the app binary by running
+
+> go build -o ily ./cmd
+
+2. After the build is done move it to your bin folder:
+
+```bash
+sudo chmod +x ily && mv ily /usr/bin/ily
+```
+3. Restart your Terminal
+
+4. Now run the following to get help on the list of available commands:
+```bash
+ily -h
+
+```
+
+## API Usage
 
 1. Start your Bitcoin node with RPC enabled.
 2. In the terminal, navigate to the project directory.
